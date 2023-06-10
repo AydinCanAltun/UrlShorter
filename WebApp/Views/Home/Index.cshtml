@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4 text-center mt-5 mb-5">URL Shorter</h1>
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <div class="mb-5">
+            <div class="mb-3">
+                <input type="text" name="RedirectUrl" class="form-control" placeholder="URL" />
+            </div>
+            <button id="generateShortUrl" class="btn btn-success">Generate Short Url</button>
+        </div>
+        <div id="successCard" class="card text-center d-none">
+            <div class="card-header">
+                Short URL Generated Successfully
+            </div>
+            <div class="card-body">
+                <a id="shortUrl" href="#" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $("#generateShortUrl").click(function(e){
+                e.preventDefault();
+                $("#successCard").addClass("d-none");
+                var formData = new FormData();
+                formData.append("", $("input[name='RedirectUrl']").val());
+                $.ajax({
+                    url: "/ShortUrlGenerator/Create/",
+                    type: "POST",
+                    data: formData,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    success: function(response){
+                        if(response.IsSuccess){
+                            let shortUrl = response.Result;
+                            $("#shortUrl").attr('href', '/' + shortUrl.UrlId);
+                            $("#successCard").removeClass("d-none");
+                        }else{
+                            toastr.error(response.Message);
+                            $("#successCard").addClass("d-none");
+                        }
+                    }
+                })
+            });
+        });
+    </script>
+}
